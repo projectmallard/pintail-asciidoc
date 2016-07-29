@@ -2,11 +2,11 @@ from setuptools import setup
 
 setup(
     name='pintail-asciidoc',
-    version='0.2',
+    version='0.3',
     description='Use AsciiDoc on Pintail sites.',
     packages=['pintail', 'pintail.asciidoc'],
     namespace_packages=['pintail'],
-    install_requires=['pintail>=0.2'],
+    install_requires=['pintail>=0.3'],
     author='Shaun McCance',
     author_email='shaunm@gnome.org',
     license='GPLv2+',
