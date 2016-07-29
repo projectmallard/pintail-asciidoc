@@ -21,20 +21,11 @@ import subprocess
 from lxml import etree
 
 import pintail.site
+import pintail.mallard
 
-class AsciiDocPage(pintail.site.MallardPage, pintail.site.ToolsProvider):
+class AsciiDocPage(pintail.mallard.MallardPage, pintail.site.ToolsProvider):
     def __init__(self, directory, source_file):
-        pintail.site.MallardPage.__init__(self, directory, source_file)
-
-    @classmethod
-    def build_tools(cls, site):
-        pass
-
-    def stage_page(self):
-        pintail.site.Site._makedirs(self.directory.stage_path)
-        subprocess.call(['asciidoctor-mallard',
-                         '-o', self.stage_path,
-                         self.source_path])
+        pintail.mallard.MallardPage.__init__(self, directory, source_file)
 
     @property
     def stage_file(self):
@@ -43,8 +34,18 @@ class AsciiDocPage(pintail.site.MallardPage, pintail.site.ToolsProvider):
         else:
             return self.source_file
 
+    def stage_page(self):
+        pintail.site.Site._makedirs(self.directory.stage_path)
+        subprocess.call(['asciidoctor-mallard',
+                         '-o', self.stage_path,
+                         self.source_path])
+
     @classmethod
     def get_pages(cls, directory, filename):
         if filename.endswith('.adoc'):
             return [AsciiDocPage(directory, filename)]
         return []
+
+    @classmethod
+    def build_tools(cls, site):
+        pass
