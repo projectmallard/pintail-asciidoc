@@ -33,10 +33,10 @@ class AsciiDocPage(pintail.mallard.MallardPage, pintail.site.ToolsProvider):
             return self.source_file
 
     def stage_page(self):
-        pintail.site.Site._makedirs(self.directory.stage_path)
+        pintail.site.Site._makedirs(self.directory.get_stage_path())
         subprocess.call(['asciidoctor-mallard',
-                         '-o', self.stage_path,
-                         self.source_path])
+                         '-o', self.get_stage_path(),
+                         self.get_source_path()])
 
     @classmethod
     def get_pages(cls, directory, filename):
