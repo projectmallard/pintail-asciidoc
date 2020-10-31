@@ -21,29 +21,47 @@ from lxml import etree
 import pintail.site
 import pintail.mallard
 
-class AsciiDocPage(pintail.mallard.MallardPage, pintail.site.ToolsProvider):
-    def __init__(self, directory, source_file):
-        pintail.mallard.MallardPage.__init__(self, directory, source_file)
+class AsciiDocPage(pintail.mallard.MallardPage):
+    """
+    A page written in AsciiDoc, a general-purpose lightweight documentation format.
+
+    The AsciiDocPage class works by converting AsciiDoc to Mallard XML
+    using the asciidoctor-mallard plugin.
+    """
+
+    def __init__(self, source, filename):
+        super().__init__(source, filename)
 
     @property
     def stage_file(self):
+        """
+        The name of the staged Mallard XML file for this AsciiDoc page.
+        """
         if self.source_file.endswith('.adoc'):
             return self.source_file[:-5] + '.page'
         else:
             return self.source_file
 
     def stage_page(self):
+        """
+        Create a Mallard XML file in the stage.
+        """
         pintail.site.Site._makedirs(self.directory.get_stage_path())
         subprocess.call(['asciidoctor-mallard',
                          '-o', self.get_stage_path(),
                          self.get_source_path()])
 
     @classmethod
-    def get_pages(cls, directory, filename):
-        if filename.endswith('.adoc'):
-            return [AsciiDocPage(directory, filename)]
-        return []
-
-    @classmethod
-    def build_tools(cls, site):
-        pass
+    def create_pages(cls, source):
+        """
+        Create a list of pages for all AsciiDoc files in a source directory.
+        """
+        pages = []
+        exclude = (source.site.config.get('exclude_files', source.name) or '').split()
+        for filename in os.listdir(source.get_source_path()):
+            if filename in exclude:
+                continue
+            if os.path.isfile(os.path.join(source.get_source_path(), filename)):
+                if filename.endswith('.adoc'):
+                    pages.append(AsciiDocPage(source, filename))
+        return pages
